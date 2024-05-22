@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card } from '@/components/ui/card'
 import type { Recipee } from '@/lib/types'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {Badge} from '@/components/ui/badge'
 defineProps<{
   recipe: Recipee;
@@ -23,6 +23,18 @@ defineProps<{
         <TableCell>{{recipe.label}}</TableCell>
       </TableRow>
       <TableRow>
+        <TableCell>Calorias:</TableCell>
+        <TableCell class="underline">{{recipe.calories}}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell>Cocina:</TableCell>
+        <TableCell>
+          <ul class="ml-4 list-disc">
+            <Badge v-for="(cousine, index) in recipe.cuisineType" :key="index">{{cousine.toUpperCase()}}</Badge>
+          </ul>
+        </TableCell>
+      </TableRow>
+      <TableRow>
         <TableCell>Ingredientes</TableCell>
         <TableCell>
           <ul class="ml-4 list-disc">
@@ -30,7 +42,15 @@ defineProps<{
           </ul>
         </TableCell>
       </TableRow>
-      <TableRow>
+      <TableRow v-if="recipe.dietLabels.length">
+        <TableCell>Dietas</TableCell>
+        <TableCell>
+          <ul class="ml-4 list-disc">
+            <Badge variant="outline" v-for="(dietLabels, index) in recipe.dietLabels" :key="index">{{dietLabels}}</Badge>
+          </ul>
+        </TableCell>
+      </TableRow>
+      <TableRow v-if="recipe.cautions.length">
         <TableCell>Precauciones</TableCell>
         <TableCell>
           <ul>
