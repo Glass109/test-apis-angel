@@ -2,7 +2,11 @@
 import { Card } from '@/components/ui/card'
 import type { Recipee } from '@/lib/types'
 import { Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import {Badge} from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge'
+import { ref } from 'vue'
+
+const imgLoaded = ref(false)
+
 defineProps<{
   recipe: Recipee;
 }>()
@@ -10,7 +14,13 @@ defineProps<{
 
 <template>
   <Card class="p-4 flex flex-col">
-    <img class="rounded" :src="recipe.image" :alt="recipe.label" />
+    <img v-show="imgLoaded"
+         class="rounded h-64 w-full"
+         :src="recipe.image"
+         :alt="recipe.label"
+         @load="imgLoaded = true"
+    />
+    <div v-show="!imgLoaded" class="h-64 w-full bg-gray-200 animate-pulse"></div>
     <Table>
       <TableHeader>
         <TableRow>
@@ -20,17 +30,17 @@ defineProps<{
       </TableHeader>
       <TableRow>
         <TableCell>Nombre:</TableCell>
-        <TableCell>{{recipe.label}}</TableCell>
+        <TableCell>{{ recipe.label }}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Calorias:</TableCell>
-        <TableCell class="underline">{{recipe.calories}}</TableCell>
+        <TableCell class="underline">{{ recipe.calories }}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell>Cocina:</TableCell>
         <TableCell>
           <ul class="ml-4 list-disc">
-            <Badge v-for="(cousine, index) in recipe.cuisineType" :key="index">{{cousine.toUpperCase()}}</Badge>
+            <Badge v-for="(cousine, index) in recipe.cuisineType" :key="index">{{ cousine.toUpperCase() }}</Badge>
           </ul>
         </TableCell>
       </TableRow>
@@ -38,7 +48,7 @@ defineProps<{
         <TableCell>Ingredientes</TableCell>
         <TableCell>
           <ul class="ml-4 list-disc">
-            <li v-for="(ingredient, index) in recipe.ingredientLines" :key="index">{{ingredient}}</li>
+            <li v-for="(ingredient, index) in recipe.ingredientLines" :key="index">{{ ingredient }}</li>
           </ul>
         </TableCell>
       </TableRow>
@@ -46,7 +56,8 @@ defineProps<{
         <TableCell>Dietas</TableCell>
         <TableCell>
           <ul class="ml-4 list-disc">
-            <Badge variant="outline" v-for="(dietLabels, index) in recipe.dietLabels" :key="index">{{dietLabels}}</Badge>
+            <Badge variant="outline" v-for="(dietLabels, index) in recipe.dietLabels" :key="index">{{ dietLabels }}
+            </Badge>
           </ul>
         </TableCell>
       </TableRow>
@@ -54,7 +65,7 @@ defineProps<{
         <TableCell>Precauciones</TableCell>
         <TableCell>
           <ul>
-            <Badge v-for="(caution, index) in recipe.cautions" :key="index">{{caution}}</Badge>
+            <Badge v-for="(caution, index) in recipe.cautions" :key="index">{{ caution }}</Badge>
           </ul>
         </TableCell>
       </TableRow>

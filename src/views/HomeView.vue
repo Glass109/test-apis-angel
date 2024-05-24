@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button'
 
 <template>
   <main class="grid place-content-center h-screen">
-    <ul>
+    <div class="grid place-content-center gap-8">
       <Button as-child>
         <RouterLink to="/recetas">Recetas</RouterLink>
       </Button>
-    </ul>
+      <Button as-child>
+        <RouterLink to="/gym">Gym</RouterLink>
+      </Button>
+    </div>
   </main>
 </template>

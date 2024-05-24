@@ -14,17 +14,18 @@ const fetchData = async () => {
   const response = await fetch(url.value)
   const data = await response.json()
   const hits = data.hits
-  const recipees = hits.map((hit: any) => hit.recipe)
-  results.value = recipees
+  results.value = hits.map((hit: any) => hit.recipe)
 }
 </script>
 
 <template>
   <main class="min-h-screen">
-    <Button as-child class="fixed left-10 top-2">
-      <RouterLink to="/">Índice</RouterLink>
-    </Button>
-    <Transition appear class="container grid place-content-center">
+    <nav class="p-4">
+      <Button as-child>
+        <RouterLink to="/">Índice</RouterLink>
+      </Button>
+    </nav>
+    <Transition name="squash" appear class="container grid place-content-center">
       <div v-if="!results" class="p-4 space-y-2">
         <Label for="query">Ingrese un ingrediente (Inglés)</Label>
         <Input name="query" type="text" v-model="query" placeholder="Potato"/>
@@ -36,10 +37,11 @@ const fetchData = async () => {
         Buscar de nuevo
       </Button>
       </div>
-
     </Transition>
-    <TransitionGroup appear tag="div" class="columns-auto md:columns-3 lg:columns-5" v-if="results">
-      <RecipeCard v-for="result in results" :recipe="result as Recipee" :key="result.uri" />
+    <TransitionGroup appear tag="div">
+      <div v-if="results" class="columns-auto md:columns-3 lg:columns-5">
+        <RecipeCard v-for="result in results" :recipe="result as Recipee" :key="result.uri" />
+      </div>
     </TransitionGroup>
   </main>
 </template>
@@ -53,9 +55,17 @@ const fetchData = async () => {
   transition: all 0.5s;
 }
 
-.v-enter, .v-leave-to {
+.v-enter-from, .v-leave-to {
   opacity: 0;
-  transform: translateY(10px);
-  scale: 0.9;
+  filter: blur(10px);
 }
+.squash-enter-active, .squash-leave-active {
+  transition: transform 0.5s;
+}
+
+.squash-enter-from, .squash-leave-to {
+  transform: scale(0);
+  position: absolute;
+}
+
 </style>
