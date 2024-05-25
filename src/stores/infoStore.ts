@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { computed } from 'vue'
 
 interface InfoPersona {
   isMale: boolean
@@ -6,7 +7,8 @@ interface InfoPersona {
   weight: number | null
   height: number | null
   activityMultiplier: number | string | null
-  ingestedCalories: number
+  ingestedCalories: number,
+  burnedCalories: number
 }
 
 export const useInfoStore = defineStore('infoStore', {
@@ -16,8 +18,14 @@ export const useInfoStore = defineStore('infoStore', {
     height: null,
     isMale: false,
     weight: null,
-    ingestedCalories: 0
+    ingestedCalories: 0,
+    burnedCalories: 0
   }),
+  getters: {
+    caloriesDifference(state): number {
+      return state.ingestedCalories - useInfoStore().getAMR() - state.burnedCalories
+    }
+  },
   actions: {
     getBasalMetabolicRate () : number {
       // Mifflin St. Jeor Equation
@@ -32,7 +40,7 @@ export const useInfoStore = defineStore('infoStore', {
       return this.getBasalMetabolicRate() * (this.activityMultiplier as number ?? 0)
     },
     updateMultiplierFromString (value: string) {
-      this.activityMultiplier = parseFloat(value).toPrecision(2)
+      this.activityMultiplier = parseFloat(value).toPrecision(6)
     },
   }
 })

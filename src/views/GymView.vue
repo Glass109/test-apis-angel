@@ -3,26 +3,48 @@ import { Button } from '@/components/ui/button'
 import { computed, ref } from 'vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {Badge} from '@/components/ui/badge'
 import type { GymResult } from '@/lib/types'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { rand } from '@vueuse/shared'
+import { useInfoStore } from '@/stores/infoStore'
+import FinishedTourDialog from '@/components/FinishedTourDialog.vue'
 
 const query = ref('')
 const results = ref<GymResult | null>(null)
 const ejercicios = ref([] as GymResult['results'])
 const url = computed(() => `https://wger.de/api/v2/exercise/?name=${query.value}`)
+const randomCalories : number = rand(300, 900)
 const fetchData = async () => {
   const response = await fetch(url.value)
-  console.log(response)
   results.value = await response.json() as GymResult
+  ejercicios.value = results.value.results
 }
 </script>
 
 <template>
   <main class="min-h-screen">
-    <nav class="p-4">
+    <nav class="p-4 flex justify-evenly items-center">
       <Button as-child>
         <RouterLink to="/">Índice</RouterLink>
       </Button>
+      <Badge variant="outline" class="p-1 space-x-2">
+        <span class="font-bold">Calorias ingeridas en el día:</span>
+        <span class="underline">{{ useInfoStore().ingestedCalories }}</span>
+      </Badge>
+      <Badge variant="outline" class="p-1 space-x-2">
+        <span class="font-bold">Calorias usadas normalmente</span>
+        <span class="underline">{{ useInfoStore().getAMR() }}</span>
+      </Badge>
+      <Badge variant="outline" class="p-1 space-x-2">
+        <span class="font-bold">Calorias quemadas con ejercicio extra:</span>
+        <span class="underline">{{ useInfoStore().burnedCalories }}</span>
+      </Badge>
+      <Badge variant="outline" class="p-1 space-x-2">
+        <span class="font-bold">Calorias ganadas/perdidas totales</span>
+        <span class="underline">{{ useInfoStore().caloriesDifference }}</span>
+      </Badge>
+      <FinishedTourDialog />
     </nav>
     <Transition name="squash" appear class="container grid place-content-center">
       <div v-if="!results" class="p-4 space-y-2">
@@ -37,7 +59,7 @@ const fetchData = async () => {
         </Button>
       </div>
     </Transition>
-    <TransitionGroup appear tag="div">
+    <TransitionGroup appear tag="div" class="columns-2">
         <div v-for="Ejercicio in ejercicios" :key="Ejercicio.uuid">
           <Card>
             <CardHeader>
@@ -45,14 +67,14 @@ const fetchData = async () => {
               <CardDescription>{{ Ejercicio.description }}</CardDescription>
             </CardHeader>
             <CardContent>
-
+              <Badge variant="destructive">Quema calórica {{ randomCalories }}</Badge>
             </CardContent>
+            <CardFooter>
+              <Button @click="useInfoStore().burnedCalories += randomCalories">¡Agregar ejercicio!</Button>
+            </CardFooter>
           </Card>
         </div>
     </TransitionGroup>
-    <div v-if="results && ejercicios.length == 0">
-      <p class="text-6xl">No se encontraron resultados :(</p>
-    </div>
   </main>
 </template>
 
