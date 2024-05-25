@@ -3,13 +3,24 @@ import { Card } from '@/components/ui/card'
 import type { Recipee } from '@/lib/types'
 import { Table, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ref } from 'vue'
+import { ref, toRefs } from 'vue'
+import { useInfoStore } from '@/stores/infoStore'
+import {Button} from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast'
 
 const imgLoaded = ref(false)
+const { ingestedCalories } = toRefs(useInfoStore())
+const {toast} = useToast()
 
 defineProps<{
   recipe: Recipee;
 }>()
+const addToCalories = (calories : number) => {
+  ingestedCalories.value += parseFloat(calories.toPrecision(2))
+  toast({
+    title: 'Calorias ingeridas',
+    description: `Se han agregado ${calories} calorias`, })
+}
 </script>
 
 <template>
@@ -33,7 +44,7 @@ defineProps<{
         <TableCell>{{ recipe.label }}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell>Calorias:</TableCell>
+        <TableCell>Calorias por porcion:</TableCell>
         <TableCell class="underline">{{ recipe.calories }}</TableCell>
       </TableRow>
       <TableRow>
@@ -70,6 +81,9 @@ defineProps<{
         </TableCell>
       </TableRow>
     </Table>
+    <Button @click="addToCalories(recipe.calories)">
+      Agregar a la dieta
+    </Button>
   </Card>
 </template>
 

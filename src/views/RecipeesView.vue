@@ -2,11 +2,14 @@
 import { Button } from '@/components/ui/button'
 import type { Recipee } from '@/lib/types'
 
-import { computed, ref } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import RecipeCard from '@/components/RecipeCard.vue'
-
+import { useInfoStore } from '@/stores/infoStore'
+import { Badge } from '@/components/ui/badge'
+import { Toaster } from '@/components/ui/toast'
+const { ingestedCalories } = toRefs(useInfoStore())
 const query = ref('')
 const results = ref<Recipee[] | null>(null)
 const url = computed(() => `https://api.edamam.com/search?q=${query.value}&app_id=4076c777&app_key=906c662bae33340fcc2381eb773ba5ad`)
@@ -20,10 +23,18 @@ const fetchData = async () => {
 
 <template>
   <main class="min-h-screen">
-    <nav class="p-4">
+    <nav class="p-4 flex justify-evenly items-center">
       <Button as-child>
         <RouterLink to="/">Índice</RouterLink>
       </Button>
+      <Badge variant="outline" class="p-1 space-x-2">
+        <span class="font-bold">Calorias quemadas diariamente:</span>
+        <span class="underline">{{ useInfoStore().getAMR() }}</span>
+      </Badge>
+      <Badge variant="outline" class="p-1 space-x-2">
+        <span class="font-bold">Calorias ingeridas:</span>
+        <span class="underline">{{ ingestedCalories }}</span>
+      </Badge>
     </nav>
     <Transition name="squash" appear class="container grid place-content-center">
       <div v-if="!results" class="p-4 space-y-2">
@@ -43,6 +54,7 @@ const fetchData = async () => {
         <RecipeCard v-for="result in results" :recipe="result as Recipee" :key="result.uri" />
       </div>
     </TransitionGroup>
+    <Toaster />
   </main>
 </template>
 
